@@ -1,0 +1,74 @@
+body{
+    margin: 0px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.container{
+    display: flex;
+    flex-direction: row;
+
+    justify-content: space-around;
+    align-items: center;
+}
+
+.box{
+    display: flex;
+    margin-top: 10px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.gray{
+    background-color: rgb(59, 67, 109);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.gray1{
+    background-color: rgb(59, 67, 109);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+#Subscribe{
+    display: flex;
+    color: white;
+    margin-left: 50px;
+    margin-right: 50px;
+}
+
+.background{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: rgb(224, 142, 0);
+    color: white;
+    padding-top: 50px;
+    padding-bottom: 50px;
+    padding-right: 20%;
+    padding-left: 20%;
+}
+#button{    
+    background-color: rgb(224, 142, 0);
+    color: white;
+}
+
+.text{
+    color: white;
+}
+
+#menu{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+#menu p{
+    margin: 0px 15px;
+}
