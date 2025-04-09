@@ -2,10 +2,56 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Comandos de Terminal - Blog</title>
 </head>
 <body>
-    
+    <header>
+        <h1>Comandos de Terminal que he aprendido</h1>
+        <hr>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="blog.html">Inicio</a></li>
+            <li><a href="Git_Github.html">Flujo de trabajo con Git y GitHub</a></li>
+            <li><a href="Terminal.html">Comandos de Terminal</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <h3>Comandos de navegación</h3>
+        <!-- usamos < > para indicar argumentos que el usuario debe reemplazar -->
+        <ul>
+            <li>pwd: muestra el directorio actual.</li>
+            <li>ls: lista los archivos y carpetas del directorio actual.</li>
+            <li>cd <directorio>: cambia al directorio especificado.</li>
+            <ul>
+                <li>cd ..: sube un nivel en la jerarquía de carpetas.</li>
+                <li>cd ~: va a mi directorio personal (home).</li>
+            </ul>
+            <li>mkdir <directorio>: crea una nueva carpeta.</li>
+            <li>rmdir <directorio>: elimina una carpeta vacía.</li>
+            <li>rm -rf <directorio>: elimina una carpeta y todo su contenido de manera forzada.</li>
+        </ul>
+
+        <h3>Manuales de ayuda</h3>
+        <ul>
+            <li>man <comando>: muestra el manual del comando.</li>
+            <li><comando> --help: muestra una ayuda rápida sobre cómo usarlo.</li>
+        </ul>
+
+        <h3>Comandos de gestión de archivos</h3>
+        <ul>
+            <li>touch <archivo>: crea un archivo vacío con ese nombre.</li>
+            <li>cp <origen> <destino>: copia el archivo de origen al destino.</li>
+            <li>mv <origen> <destino>: mueve o renombra el archivo.</li>
+            <li>rm <archivo>: elimina un archivo.</li>
+        </ul>
+    </main>
+
+    <footer>
+        <hr>
+        <p>Creado por Sergio Jiawei Xuan. Blog de repaso para actividades de la clase. </p>
+    </footer>
 </body>
 </html>
