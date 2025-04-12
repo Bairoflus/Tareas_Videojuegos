@@ -1,0 +1,76 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: hsla(0, 100%, 60%, 0.795);
+    color: #000000;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+header {
+    background-color: #4285f4;
+    display: flex;
+    color: white;
+    padding: 20px;
+    justify-content: space-around;
+    align-items: center;
+    text-align: center;
+    border-bottom: 5px solid #2c3e50;
+}
+
+section {
+    margin: 20px;
+    padding: 15px;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+}
+
+.text{
+    color: white;
+}
+
+#menu{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+#menu p{
+    margin: 0px 15px;
+}
+
+.concepto {
+    font-style: italic;
+    font-weight: bold;
+    border-left: 5px solid #4CAF50;
+}
+
+.selectores {
+    border-right: 5px dashed #e91e63;
+}
+
+.explicacion-css{
+    border: 5px dashed #347bff
+}
+
+#introduccion {
+    border-top: 4px dotted #ff9800;
+    border-bottom: 4px dotted #ff9800;
+}
+
+ul, ol {
+    list-style: square;
+    padding-left: 30px;
+}
+
+section h2 {
+    width: 100%;
+    height: auto;
+}
+
+h1, h2 {
+    font: 24px Georgia, serif;
+    color: #222;
+}
