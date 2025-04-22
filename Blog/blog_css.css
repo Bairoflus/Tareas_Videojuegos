@@ -74,3 +74,13 @@ h1, h2 {
     font: 24px Georgia, serif;
     color: #222;
 }
+
+.gray1{
+    background-color: #4285f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    color: black;
+}
+

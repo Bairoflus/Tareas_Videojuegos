@@ -1,0 +1,49 @@
+body{
+    background-color: #2C3043;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: 0.5fr 1fr 1fr;
+    gap: 30px;
+    margin: 30px;
+    height: 95vh;
+  }
+
+.box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+}
+
+.one {
+    background: #FDA061;
+    grid-column: 1 / 4;
+}
+
+.two {
+    background: #01A787;
+    grid-row: span 2;
+    grid-column: 1 / 2;
+}
+  
+.three {
+    background: #34DABA;
+    grid-row: 2 / 3;
+    grid-column: 2 / 4;
+}
+
+.four {
+    background: #FC6057;
+    grid-row: 3 / 4;
+    grid-column: 2 / 3;
+}
+
+.five {
+    background: #FDA061;
+    grid-row: 3 / 4;
+    grid-column: 3 / 4;
+}
