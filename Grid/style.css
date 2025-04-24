@@ -1,0 +1,26 @@
+body{
+    background-color: #2C3043;
+}
+.grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 30px;
+    margin: 30px;
+    height: 95vh;
+}
+
+.box{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-weight: bold;
+}
+
+.one{background-color: #FC6057;}
+.two{background-color: #FD825C;}
+.three{background-color: #FDA061;}  
+.four{background-color: #01A787;}
+.five{background-color: #1BC1A1;}
+.six{background-color: #34DABA;}
