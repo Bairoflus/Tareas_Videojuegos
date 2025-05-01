@@ -351,6 +351,44 @@ app.post('/users/delete', function (req, res) {
   res.status(200).json({ message: `Usuario con id='${id}' eliminado correctamente.` });
 });
 
+// VIEW EDIT USER
+app.get('/users/edit', function (req, res) {
+  fs.readFile('public/html/editUsersID.html', 'utf8', (err, html) => {
+    if (err) {
+      // Code 500: Internal Server Error
+      res.status(500).send('There was an error loading the HTML file, error code: ' + err);
+      return;
+    }
+
+    console.log("Sending page...");
+    res.send(html);
+    console.log("Page sent.");
+  });
+});
+
+// Actualizar un usuario por su id
+app.post('/users/edit', function (req, res) {
+  const body = req.body;
+  const id = Number(body.id);
+  const name = body.name;
+  const email = body.email;
+
+  // Buscamos el índice del usuario a editar
+  const index = users.findIndex(user => user.id === id);
+
+  if (!index && index !== 0) {
+    // Code 404: Not Found
+    res.status(404).json({ message: `No se encontró un usuario con id='${id}'.` });
+    return;
+  }
+
+  // Si lo encontramos, lo editamos
+  users[index].name = name;
+  users[index].email = email;
+
+  // Code 200: OK
+  res.status(200).json({ message: `Usuario con id='${id}' editado correctamente.` });
+});
 // FIN --- USERS ENDPOINTS
 
 // Arrancamos el servidor
