@@ -316,6 +316,41 @@ app.post('/users/check/id', function (req, res) {
   res.status(200).json(user); // Devolvemos el usuario encontrado
 });
 
+// VIEW DELETE USER
+app.get('/users/delete', function (req, res) {
+  fs.readFile('public/html/deleteUsersID.html', 'utf8', (err, html) => {
+    if (err) {
+      // Code 500: Internal Server Error
+      res.status(500).send('There was an error loading the HTML file, error code: ' + err);
+      return;
+    }
+
+    console.log("Sending page...");
+    res.send(html);
+    console.log("Page sent.");
+  });
+});
+
+// Eliminar un usuario por su id
+app.post('/users/delete', function (req, res) {
+  const body = req.body;
+  const id = Number(body.id);
+
+  // Buscamos el índice del usuario a eliminar
+  const index = users.findIndex(user => user.id === id);
+
+  if (!index && index !== 0) {
+    // Code 404: Not Found
+    res.status(404).json({ message: `No se encontró un usuario con id='${id}'.` });
+    return;
+  }
+
+  // Si lo encontramos, lo eliminamos
+  users.splice(index, 1);
+  // Code 200: OK
+  res.status(200).json({ message: `Usuario con id='${id}' eliminado correctamente.` });
+});
+
 // FIN --- USERS ENDPOINTS
 
 // Arrancamos el servidor
