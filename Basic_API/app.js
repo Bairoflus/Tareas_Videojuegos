@@ -51,8 +51,8 @@ app.get('/items/register', function (req, res) {
 // Endpoint para crear un nuevo ítem
 app.post('/items/register', function (req, res) {
   const body = req.body;      // Todo lo que envies sera un JSON
-  const id = body.id;         // sacamos cada campo
-  const userid = body.userid;
+  const id = Number(body.id);         // sacamos cada campo
+  const userid = Number(body.userid);
   const name = body.name;
   const type = body.type;
   const effect = body.effect;
@@ -272,6 +272,12 @@ app.post('/users/register', function (req, res) {
     message: 'Usuario agregado correctamente.',
     user: newUser
   });
+});
+
+// Ver users del catalogo
+app.get('/users/check', function (req, res) {
+  // Devolvemos la lista de users
+  res.status(200).json(users);
 });
 
 // FIN --- USERS ENDPOINTS
