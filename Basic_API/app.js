@@ -280,6 +280,42 @@ app.get('/users/check', function (req, res) {
   res.status(200).json(users);
 });
 
+// VIEW USERS WITH ID
+app.get('/users/check/id', function (req, res) {
+  fs.readFile('public/html/checkUsersID.html', 'utf8', (err, html) => {
+    if (err) {
+      // Code 500: Internal Server Error
+      res.status(500).send('There was an error loading the HTML file, error code: ' + err);
+      return;
+    }
+
+    console.log("Sending page...");
+    res.send(html);
+    console.log("Page sent.");
+  });
+});
+
+// Ver un usuario por su id
+app.post('/users/check/id', function (req, res) {
+  const body = req.body;
+  const id = Number(body.id);
+
+  let user = null; // Inicializamos la variable user como null
+  for (let i = 0; i < users.length; i++) {
+    if (users[i].id === id) {
+      user = users[i]; // Si encontramos el usuario, lo guardamos en la variable user
+      break; // Salimos del bucle una vez que encontramos el usuario
+    }
+  }
+
+  if (!user) {
+    // Code 404: Not Found
+    res.status(404).json({ message: `No se encontró un usuario con id='${id}'.` });
+    return;
+  }
+  res.status(200).json(user); // Devolvemos el usuario encontrado
+});
+
 // FIN --- USERS ENDPOINTS
 
 // Arrancamos el servidor
