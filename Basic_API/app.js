@@ -15,6 +15,8 @@ app.use(bodyParser.json()); // para poder recibir datos en el body de las petici
 
 // Aquí guardaremos los ítems “en memoria”
 const items = [];
+// Aquí guardaremos los usuarios “en memoria”
+const users = [];
 
 app.get('/', function (req, res) {
   fs.readFile('public/html/helloWorld.html', 'utf8', (err, html) => {
@@ -48,8 +50,9 @@ app.get('/items/register', function (req, res) {
 
 // Endpoint para crear un nuevo ítem
 app.post('/items/register', function (req, res) {
-  const body = req.body; // Todo lo que envies sera un JSON
-  const id = body.id;     // sacamos cada campo
+  const body = req.body;      // Todo lo que envies sera un JSON
+  const id = body.id;         // sacamos cada campo
+  const userid = body.userid;
   const name = body.name;
   const type = body.type;
   const effect = body.effect;
@@ -63,9 +66,17 @@ app.post('/items/register', function (req, res) {
     }
   }
   // Valida que esten todos los campos
-  if (!id || !name || !type || !effect) {
+  if (!id || !name || !type || !effect || !userid) {
     // Code 400: Bad Request
-    res.status(400).json({ message: "Faltan atributos: id, name, type y effect son obligatorios." });
+    res.status(400).json({ message: "Faltan atributos: id, name, type, effect y userid son obligatorios." });
+    return;
+  }
+
+  // Encontrar el usuario por su id
+  const user = users.find(user => user.id === userid);
+  if (!user) {
+    // Code 404: Not Found
+    res.status(404).json({ message: `No se encontró un usuario con id='${userid}'.` });
     return;
   }
 
@@ -76,7 +87,9 @@ app.post('/items/register', function (req, res) {
     type: type,
     effect: effect
   };
-  items.push(newItem);
+
+  // darle el item al usuario
+  user.items.push(newItem); // Agregamos el id del item al array de items del usuario
 
   // Devolvemos un mensaje de éxito cuando se haya agregado el ítem
   // Code 201: Created
@@ -203,12 +216,63 @@ app.post('/items/edit', function (req, res) {
   // Code 200: OK
   res.status(200).json({ message: `Ítem con id='${id}' editado correctamente.` });
 });
-
-
 // FIN --- ITEMS ENDPOINTS
 
 // USERS ENDPOINTS
 // VIEW
+app.get('/users/register', function (req, res) {
+  fs.readFile('public/html/registerUsers.html', 'utf8', (err, html) => {
+    if (err) {
+      // Code 500: Internal Server Error
+      res.status(500).send('There was an error loading the HTML file, error code: ' + err);
+      return;
+    }
+
+    console.log("Sending page...");
+    res.send(html);
+    console.log("Page sent.");
+  });
+});
+
+// Endpoint para crear un nuevo usuario
+app.post('/users/register', function (req, res) {
+  const body = req.body;      // Todo lo que envies sera un JSON
+  const id = body.id;         // sacamos cada campo
+  const name = body.name;
+  const email = body.email;
+
+  // Verifica que no exista ya otro usuario con el mismo id
+  for (let i = 0; i < users.length; i++) {
+    if (users[i].id === id) {
+      // Code 409: Conflict
+      res.status(409).json({ message: `Ya existe un usuario con id='${id}'.` });
+      return;
+    }
+  }
+  // Valida que esten todos los campos
+  if (!id || !name || !email) {
+    // Code 400: Bad Request
+    res.status(400).json({ message: "Faltan atributos: id, name y email son obligatorios." });
+    return;
+  }
+
+  // Si todo esta correcto, lo agregamos a nuestra lista
+  const newUser = {
+    id: Number(id),
+    name: name,
+    email: email,
+    items: [] // Inicializamos el array de items vacio
+  };
+
+  users.push(newUser); // Agregamos el nuevo usuario al array de usuarios
+
+  // Devolvemos un mensaje de éxito cuando se haya agregado el usuario
+  // Code 201: Created
+  res.status(201).json({
+    message: 'Usuario agregado correctamente.',
+    user: newUser
+  });
+});
 
 // FIN --- USERS ENDPOINTS
 
