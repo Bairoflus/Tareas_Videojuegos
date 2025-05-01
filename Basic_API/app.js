@@ -2,6 +2,7 @@
 
 import express from 'express'; // importamos express, que es el framework que vamos a usar
 import fs from 'fs'; // importamos fs, que es el módulo de Node.js para trabajar con el sistema de archivos
+import bodyParser from 'body-parser'; // importamos body-parser, que es un middleware para parsear el body de las peticiones HTTP
 
 const app = express();
 const port = 3000;
@@ -9,6 +10,8 @@ const port = 3000;
 app.use(express.json());
 
 app.use(express.static('public')); // carpeta donde guardamos los archivos estáticos (HTML, CSS, JS, imágenes...)
+app.use(bodyParser.urlencoded({ extended: false })); // para poder recibir datos en el body de las peticiones POST
+app.use(bodyParser.json()); // para poder recibir datos en el body de las peticiones POST
 
 // Aquí guardaremos los ítems “en memoria”
 const items = [];
@@ -27,15 +30,30 @@ app.get('/', function (req, res) {
   });
 });
 
+// ITEMS ENDPOINTS
+// VIEW
+app.get('/items/register', function (req, res) {
+  fs.readFile('public/html/items.html', 'utf8', (err, html) => {
+    if (err) {
+      // Code 500: Internal Server Error
+      res.status(500).send('There was an error loading the HTML file, error code: ' + err);
+      return;
+    }
+
+    console.log("Sending page...");
+    res.send(html);
+    console.log("Page sent.");
+  });
+});
+
 // Endpoint para crear un nuevo ítem
-app.post('/items', function (req, res) {
-  const body = req.body;      // todo lo que envíes en JSON
-  const id     = body.id;     // sacamos cada campo
-  const name   = body.name;
-  const type   = body.type;
+app.post('/items/register', function (req, res) {
+  const body = req.body; // Todo lo que envies sera un JSON
+  const id = body.id;     // sacamos cada campo
+  const name = body.name;
+  const type = body.type;
   const effect = body.effect;
 
-  
   // Verifica que no exista ya otro ítem con el mismo id
   for (let i = 0; i < items.length; i++) {
     if (items[i].id === id) {
@@ -47,13 +65,13 @@ app.post('/items', function (req, res) {
   // Valida que esten todos los campos
   if (!id || !name || !type || !effect) {
     // Code 400: Bad Request
-    res.status(400).json({ message: "Faltan atributos: id, name, type y effect son obligatorios."});
+    res.status(400).json({ message: "Faltan atributos: id, name, type y effect son obligatorios." });
     return;
   }
-  
+
   // Si todo esta correcto, lo agregamos a nuestra lista
   const newItem = {
-    id: id,
+    id: Number(id),
     name: name,
     type: type,
     effect: effect
@@ -67,6 +85,55 @@ app.post('/items', function (req, res) {
     item: newItem
   });
 });
+
+// Ver items del catalogo
+app.get('/items/check', function (req, res) {
+  // Devolvemos la lista de ítems
+  res.status(200).json(items);
+});
+
+// VIEW ITEMS WITH ID
+app.get('/items/check/id', function (req, res) {
+  fs.readFile('public/html/checkItemsID.html', 'utf8', (err, html) => {
+    if (err) {
+      // Code 500: Internal Server Error
+      res.status(500).send('There was an error loading the HTML file, error code: ' + err);
+      return;
+    }
+
+    console.log("Sending page...");
+    res.send(html);
+    console.log("Page sent.");
+  });
+});
+
+// Ver un ítem por su id
+app.post('/items/check/id', function (req, res) {
+  const body = req.body;
+  const id = Number(body.id);
+
+  let item = null; // Inicializamos la variable item como null
+  for (let i = 0; i < items.length; i++) {
+    if (items[i].id === id) {
+      item = items[i]; // Si encontramos el ítem, lo guardamos en la variable item
+      break; // Salimos del bucle una vez que encontramos el ítem
+    }
+  }
+
+  if (!item) {
+    // Code 404: Not Found
+    res.status(404).json({ message: `No se encontró un ítem con id='${id}'.` });
+    return;
+  }
+  res.status(200).json(item); // Devolvemos el ítem encontrado
+});
+
+// FIN --- ITEMS ENDPOINTS
+
+// USERS ENDPOINTS
+// VIEW
+
+// FIN --- USERS ENDPOINTS
 
 // Arrancamos el servidor
 app.listen(port, function () {
