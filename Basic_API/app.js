@@ -1,109 +1,149 @@
 "use strict";
 
-import express from 'express';
-import bodyParser from 'body-parser';
-import * as svc from './public/js/hello_user.js';
+import express from 'express'; // Para crear el servidor
+import fs from 'fs'; // Para leer archivos
+import bodyParser from 'body-parser'; // Para parsear el body de las peticiones
+import path from 'path'; // Para manejar rutas de archivos
 
 const app = express();
 const port = 3000;
 
-// Middlewares
 app.use(express.json());
-app.use(bodyParser.urlencoded({ extended: false })); // Para poder recibir datos en el body de las peticiones POST
-app.use(bodyParser.json()); // Para poder recibir datos en el body de las peticiones POST
+app.use(express.static(path.resolve('public'))); // Para acceder a archivos estáticos
+app.use(bodyParser.urlencoded({ extended: true })); // Para recibir datos de formularios
+app.use(bodyParser.json()); // Para recibir datos JSON
 
-// Carpeta donde guardamos los archivos estáticos (HTML, CSS, JS, imágenes...)
-app.use(express.static('public'));
+// Aquí guardamos los datos.
+let users = [];
+let items = [];
 
 // Página principal
 app.get('/', (req, res) => {
-  res.sendFile('helloWorld.html', { root: 'public/html' });
+  res.sendFile('html/helloWorld.html', { root: 'public' });
 });
 
-// Formularios de Users
-app.get('/users/register', (req, res) => {
-  res.sendFile('registerUsers.html', { root: 'public/html' });
-});
-app.get('/users/check/id', (req, res) => {
-  res.sendFile('checkUsersID.html', { root: 'public/html' });
-});
-app.get('/users/edit', (req, res) => {
-  res.sendFile('editUsersID.html', { root: 'public/html' });
-});
-app.get('/users/delete', (req, res) => {
-  res.sendFile('deleteUsersID.html', { root: 'public/html' });
+// — Usuarios —
+// Crear
+app.post('/api/users', (req, res) => {
+  const { id, name, email } = req.body;
+  if (users.find(u => u.id == id)) {
+    return res.status(400).json({ message: 'Usuario ya existe.' });
+  }
+  const newUser = { id, name, email, items: [] };
+  users.push(newUser);
+  res.status(201).json({ message: 'Usuario creado.', user: newUser });
 });
 
-// Formularios de Items
-app.get('/items/register', (req, res) => {
-  res.sendFile('registerItems.html', { root: 'public/html' });
-});
-app.get('/items/check/id', (req, res) => {
-  res.sendFile('checkItemsID.html', { root: 'public/html' });
-});
-app.get('/items/edit', (req, res) => {
-  res.sendFile('editItemsID.html', { root: 'public/html' });
-});
-app.get('/items/delete', (req, res) => {
-  res.sendFile('deleteItemsID.html', { root: 'public/html' });
-});
-
-// --- API ENDPOINTS ---
-// Users
-app.post('/users/register', (req, res) => {
-  const result = svc.registerUser(req.body);
-  if (result.user) return res.status(result.status).json({ message: 'Usuario agregado correctamente.', user: result.user });
-  res.status(result.status).json({ message: result.message });
+// Leer todos los usuarios
+app.get('/api/users', (req, res) => {
+  const usersWithItems = users.map(u => {
+    const fullItems = u.items
+      .map(itemId => items.find(i => i.id == itemId))
+      .filter(i => i != null);
+    return {
+      id: u.id,
+      name: u.name,
+      email: u.email,
+      items: fullItems
+    };
+  });
+  res.json(usersWithItems);
 });
 
-app.get('/users/check', (req, res) => {
-  const result = svc.getAllUsers();
-  res.status(result.status).json(result);
+// Leer un usuario por ID
+app.get('/api/users/:id', (req, res) => {
+  const u = users.find(u => u.id == req.params.id);
+  if (!u) {
+    return res.status(404).json({ message: 'Usuario no encontrado.' });
+  }
+  const fullItems = u.items
+    .map(itemId => items.find(i => i.id == itemId))
+    .filter(i => i != null);
+  const userWithItems = {
+    id: u.id,
+    name: u.name,
+    email: u.email,
+    items: fullItems
+  };
+  res.json(userWithItems);
 });
 
-app.post('/users/check/id', (req, res) => {
-  const result = svc.getUserById(req.body.id);
-  res.status(result.status).json(result);
+// Actualizar un usuario
+app.put('/api/users/:id', (req, res) => {
+  const u = users.find(u => u.id == req.params.id);
+  if (!u) {
+    return res.status(404).json({ message: 'Usuario no existe.' });
+  }
+  const { name, email } = req.body;
+  if (name) u.name = name;
+  if (email) u.email = email;
+  res.json({ message: 'Usuario actualizado.', user: u });
 });
 
-app.post('/users/edit', (req, res) => {
-  const result = svc.updateUser(req.body);
-  res.status(result.status).json({ message: result.message });
+// Borrar un usuario
+app.delete('/api/users/:id', (req, res) => {
+  const idx = users.findIndex(u => u.id == req.params.id);
+  if (idx < 0) {
+    return res.status(404).json({ message: 'Usuario no existe.' });
+  }
+  users.splice(idx, 1);
+  res.json({ message: 'Usuario borrado.' });
 });
 
-app.post('/users/delete', (req, res) => {
-  const result = svc.deleteUser(req.body.id);
-  res.status(result.status).json({ message: result.message });
+// --- Items CRUD ---
+// Crear un ítem
+app.post('/api/items', (req, res) => {
+  const { id, userid, name, type, effect } = req.body;
+  if (items.find(i => i.id == id)) {
+    return res.status(400).json({ message: 'Ítem ya existe.' });
+  }
+  const owner = users.find(u => u.id == userid);
+  if (!owner) {
+    return res.status(404).json({ message: 'Usuario dueño no existe.' });
+  }
+  const newItem = { id, name, type, effect };
+  items.push(newItem);
+  owner.items.push(id);
+  res.status(201).json({ message: 'Ítem creado.', item: newItem });
 });
 
-// Items
-app.post('/items/register', (req, res) => {
-  const result = svc.registerItem(req.body);
-  if (result.item) return res.status(result.status).json({ message: 'Ítem agregado correctamente.', item: result.item });
-  res.status(result.status).json({ message: result.message });
+// Leer todos los ítems
+app.get('/api/items', (req, res) => {
+  res.json(items);
 });
 
-app.get('/items/check', (req, res) => {
-  const result = svc.getAllItems();
-  res.status(result.status).json(result);
+// Leer un ítem por ID
+app.get('/api/items/:id', (req, res) => {
+  const it = items.find(i => i.id == req.params.id);
+  if (!it) return res.status(404).json({ message: 'Ítem no encontrado.' });
+  res.json(it);
 });
 
-app.post('/items/check/id', (req, res) => {
-  const result = svc.getItemById(req.body.id);
-  res.status(result.status).json(result);
+// Actualizar un ítem
+app.put('/api/items/:id', (req, res) => {
+  const it = items.find(i => i.id == req.params.id);
+  if (!it) {
+    return res.status(404).json({ message: 'Ítem no existe.' });
+  }
+  const { name, type, effect } = req.body;
+  if (name) it.name = name;
+  if (type) it.type = type;
+  if (effect) it.effect = effect;
+  res.json({ message: 'Ítem actualizado.', item: it });
 });
 
-app.post('/items/edit', (req, res) => {
-  const result = svc.updateItem(req.body);
-  res.status(result.status).json({ message: result.message });
+// Borrar un ítem`
+app.delete('/api/items/:id', (req, res) => {
+  const idx = items.findIndex(i => i.id == req.params.id);
+  if (idx < 0) {
+    return res.status(404).json({ message: 'Ítem no existe.' });
+  }
+  const [removed] = items.splice(idx, 1);
+  users.forEach(u => {
+    u.items = u.items.filter(itemId => itemId != removed.id);
+  });
+  res.json({ message: 'Ítem borrado.' });
 });
 
-app.post('/items/delete', (req, res) => {
-  const result = svc.deleteItem(req.body.id);
-  res.status(result.status).json({ message: result.message });
-});
-
-// Iniciar servidor
-app.listen(port, () => {
-  console.log(`Servidor corriendo en http://localhost:${port}`);
-});
+// Start server
+app.listen(port, () => console.log(`Server running at http://localhost:${port}`));
